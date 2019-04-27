@@ -138,8 +138,8 @@ public class AppPortafoglio {
 				try {
 					statusPortafoglio(portafoglio);
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					err.println("Error checking status portafolio: " + e.getMessage() + 
+							", SQLState: " + e.getSQLState());
 				}
 				menu();
 				continue;
@@ -147,6 +147,13 @@ public class AppPortafoglio {
 			
 			if(opzione == 4) {
 				// exit
+				try {
+					porfolioDB.closeConnection();
+				} catch (SQLException e) {
+					err.println("Error closing connectio: " + 
+							e.getMessage() + 
+							", SQLState: " + e.getSQLState());
+				}
 				out.println("Applicazione terminata");
 				break;
 			}

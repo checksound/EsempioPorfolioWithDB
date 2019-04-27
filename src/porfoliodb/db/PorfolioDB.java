@@ -14,7 +14,9 @@ import porfoliodb.core.OperationType;
 import porfoliodb.core.Operazione;
 
 public class PorfolioDB {
-
+	
+	private Connection conn = null;
+	
 	private final String urlDB;
 	private final String usernameDB;
 	private final String passwordDB;
@@ -32,18 +34,20 @@ public class PorfolioDB {
 
 	}
 
-	private void closeConnection(Connection conn) throws SQLException {
-
-		conn.close();
+	public void closeConnection() throws SQLException {
+		if(conn !=null)
+			conn.close();
 	}
 
 	public boolean insertOperazione(Operazione op) throws SQLException {
-
-		Connection con = getConnection();
+        
+		if (conn == null)
+			conn = getConnection();
+		
 		PreparedStatement pstmt = null;
 
 		try {
-			pstmt = con.prepareStatement("INSERT INTO OPERAZIONI (OPERAZIONE, QUANT, DATE_OP) VALUES (?, ?, ?)");
+			pstmt = conn.prepareStatement("INSERT INTO OPERAZIONI (OPERAZIONE, QUANT, DATE_OP) VALUES (?, ?, ?)");
 			
 			if(op.operationType == OperationType.PRELIEVO)
 				pstmt.setString(1, "P");
@@ -52,12 +56,10 @@ public class PorfolioDB {
 			
 			pstmt.setInt(2, op.quantita);
 			pstmt.setTimestamp(3, new Timestamp(op.timestamp));
-			pstmt.executeUpdate();
+			int val = pstmt.executeUpdate();
 		} finally {
 			if (pstmt != null)
 				pstmt.close();
-			if(con != null)
-				con.close();
 		}
 		return true;
 	}
@@ -65,13 +67,15 @@ public class PorfolioDB {
 	public List<Operazione> getOperazioni() throws SQLException {
 		List<Operazione> listOperazione = new ArrayList<>();
         
-        Connection con = getConnection();
+		if (conn == null)
+			conn = getConnection();
+		
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
 		try {
 			
-			pstmt = con.prepareStatement("SELECT * FROM OPERAZIONI ORDER BY DATE_OP");
+			pstmt = conn.prepareStatement("SELECT * FROM OPERAZIONI ORDER BY DATE_OP");
 			
 			rs = pstmt.executeQuery();
 			
@@ -97,8 +101,6 @@ public class PorfolioDB {
 				rs.close();
 			if (pstmt != null)
 				pstmt.close();
-			if(con != null)
-				con.close();
 		}
         
 		return listOperazione;
@@ -107,13 +109,15 @@ public class PorfolioDB {
 	public List<Operazione> getOperazioni(OperationType type) throws SQLException {
 		List<Operazione> listOperazione = new ArrayList<>();
         
-        Connection con = getConnection();
+		if (conn == null)
+			conn = getConnection();
+		
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
 		try {
 			
-			pstmt = con.prepareStatement("SELECT * FROM OPERAZIONI WHERE OPERAZIONE = ? ORDER BY DATE_OP");
+			pstmt = conn.prepareStatement("SELECT * FROM OPERAZIONI WHERE OPERAZIONE = ? ORDER BY DATE_OP");
 			
 			String operationStr = null;
 			
@@ -148,8 +152,7 @@ public class PorfolioDB {
 				rs.close();
 			if (pstmt != null)
 				pstmt.close();
-			if(con != null)
-				con.close();
+
 		}
         
 		return listOperazione;
@@ -157,9 +160,10 @@ public class PorfolioDB {
 
 	public List<Operazione> getOperazioni(OperationType type, Date fromDate, Date toDate) throws SQLException {
 
-		Connection conn = getConnection();
+		if (conn == null)
+			conn = getConnection();
 
-		closeConnection(conn);
+		
 
 		return null;
 	}
