@@ -1,11 +1,18 @@
 package porfoliodb.app;
 
 import static java.lang.System.out;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import static java.lang.System.err;
 
 import java.sql.SQLException;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Properties;
 import java.util.Scanner;
 
 import porfoliodb.core.Operazione;
@@ -88,12 +95,45 @@ public class AppPortafoglio {
 	
 	public static void main(String[] args) {
 		
+		String pathConfigFile = "./conf/config.properties";
+		
+		Properties prop = new Properties();
+		
+		try {
+			prop.load(new FileInputStream(pathConfigFile));
+		} catch (FileNotFoundException e1) {
+			err.println("Error loading config file: " + 
+					e1.getMessage());
+			return;
+		} catch (IOException e1) {
+			err.println("Error loading config file: " + 
+					e1.getMessage());
+			return;
+		}
+		
+		out.println("Caricate le configurazioni da file: " + 
+				(new File(pathConfigFile)).getAbsolutePath());
+
+		String dbURL = prop.getProperty("dbURL");
+		String dbUSERNAME = prop.getProperty("dbUSERNAME");
+		String dbPASSWORD = prop.getProperty("dbPASSWORD");
+        
+		if(dbUSERNAME == null)
+        	dbUSERNAME = "";
+        
+        if(dbPASSWORD == null)
+        	dbPASSWORD = "";
+        
+		out.println("* dbURL:" + dbURL);
+		out.println("* dbUSERNAME: " + dbUSERNAME);
+		out.println("* dbPASSWORD: " + dbPASSWORD);
+		out.println("*");
+		out.println("*****************************");
 		
         List<Operazione> listOperations = null;
         
-        
-        PorfolioDB porfolioDB = new PorfolioDB("jdbc:h2:~/porfolio_db", 
-				"sa", "");
+        PorfolioDB porfolioDB = new PorfolioDB(dbURL, 
+        		dbUSERNAME, dbPASSWORD);
         
         Portafoglio portafoglio = null;
         
