@@ -1,26 +1,21 @@
 package porfoliodb.app;
 
 import static java.lang.System.out;
+import static java.lang.System.err;
 
-import java.io.File;
-import java.io.IOException;
+import java.sql.SQLException;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
 import porfoliodb.core.Operazione;
 import porfoliodb.core.Portafoglio;
-import porfoliodb.exception.ParsingFormatException;
+import porfoliodb.db.PorfolioDB;
 import porfoliodb.exception.PorfolioException;
-import porfoliodb.util.PorfolioOnFile;
 
 public class AppPortafoglio {
 	
-	private static boolean isPorfolioModified = false;
-	
-	private static String DATA_FILE_NAME = ".porfolio";
-	
-	private static void statusPortafoglio(Portafoglio portafoglio) {
+	private static void statusPortafoglio(Portafoglio portafoglio) throws SQLException {
 		
 		out.println("** STATUS PORTAFOGLIO **");
 		
@@ -93,41 +88,22 @@ public class AppPortafoglio {
 	
 	public static void main(String[] args) {
 		
-		/* Create a dataFile variable of type File to represent the
-         * data file that is stored in the user's home directory.
-         */
-
-        File userHomeDirectory = new File( System.getProperty("user.home") );
-        File dataFile = new File( userHomeDirectory, DATA_FILE_NAME );
-      
+		
         List<Operazione> listOperations = null;
         
-        PorfolioOnFile dataPorfolioFile = 
-        		new PorfolioOnFile(dataFile);
         
-        if (!dataFile.exists()) {
-            out.println("No porfolio data file found.  A new one");
-            out.println("will be created, if you add any entries.");
-            out.println("File name:  " + dataFile.getAbsolutePath());
-        }
-        else {
-            out.println("Reading porfolio data...");
-            
-            try {
-    			listOperations = dataPorfolioFile.readFromFile();
-    		} catch (IOException e1) {
-    			System.err.println("IOException: " + e1.getMessage());
-    		} catch (ParsingFormatException e1) {
-    			System.err.println("ParsingFormatException: " + e1.getMessage());
-    		}
-        }
+        PorfolioDB porfolioDB = new PorfolioDB("jdbc:h2:~/porfolio_db", 
+				"sa", "");
         
-		Portafoglio portafoglio = null;
-		
-		if(listOperations == null)
-			portafoglio = new Portafoglio();
-		else
-			portafoglio = new Portafoglio(listOperations);
+        Portafoglio portafoglio = null;
+        
+        try {
+			portafoglio = new Portafoglio(porfolioDB);
+		} catch (SQLException e) {
+			err.println("Error FATAL: " + e.getMessage() + 
+					", SQLState: " + e.getSQLState());
+			return;
+		}
 		
 		Scanner scanner = new Scanner(System.in);
 		
@@ -158,23 +134,19 @@ public class AppPortafoglio {
 			
 			if(opzione == 3) {
 				// status conto
-				statusPortafoglio(portafoglio);
+				
+				try {
+					statusPortafoglio(portafoglio);
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				menu();
 				continue;
 			}
 			
 			if(opzione == 4) {
 				// exit
-				
-				if(isPorfolioModified) {
-					out.println("SALVATAGGIO DATI");
-					try {
-						dataPorfolioFile.writeToFile(portafoglio.getListOperazioni());
-					} catch (IOException e) {
-						System.err.println("IOException saving - " 
-								+ e.getMessage());						
-					}
-				}
 				out.println("Applicazione terminata");
 				break;
 			}
@@ -184,11 +156,18 @@ public class AppPortafoglio {
 			switch(opzione) {
 				case 1:
 					quantita = menuVersamento(scanner);
+				try {
 					portafoglio.versa(quantita);
 					
-					isPorfolioModified = true;
-					
 					out.println("OK versamento: " + quantita);
+					
+				} catch (SQLException e) {
+					err.println("ERRORE VERSAMENTO: " + quantita + 
+							" - ERROR: " + e.getMessage() + 
+							", SQLState: " + e.getSQLState());
+				}
+					
+					
 					break;
 				case 2:
 					quantita = menuPrelievo(scanner);
@@ -196,12 +175,14 @@ public class AppPortafoglio {
 					try {
 						portafoglio.preleva(quantita);
 						
-						isPorfolioModified = true;
-						
 						out.println("OK prelievo: " + quantita);
 					} catch (PorfolioException e) {
-						System.err.println("ERRORE su prelievo: " + e.getMessage());
-					} 
+						err.println("ERRORE su prelievo: " + e.getMessage());
+					} catch (SQLException e) {
+						err.println("ERRORE PRELIEVO: " + quantita + 
+								" - ERROR: " + e.getMessage() + 
+								", SQLState: " + e.getSQLState());
+					}
 					
 					break;
 			}
