@@ -65,97 +65,13 @@ public class PorfolioDB {
 	}
 
 	public List<Operazione> getOperazioni() throws SQLException {
-		List<Operazione> listOperazione = new ArrayList<>();
-        
-		if (conn == null)
-			conn = getConnection();
-		
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
-		try {
-			
-			pstmt = conn.prepareStatement("SELECT * FROM OPERAZIONI ORDER BY DATE_OP");
-			
-			rs = pstmt.executeQuery();
-			
-			while(rs.next()){
-		         //Retrieve by column name
-		         int id  = rs.getInt("id");
-		         String operazione = rs.getString("OPERAZIONE");
-		         int quant = rs.getInt("QUANT");
-		         Date dateOp = rs.getTimestamp("DATE_OP");
-
-		         OperationType opType = null;
-		         
-		         if("V".equals(operazione))
-		        	 opType = OperationType.VERSAMENTO;
-		         else if("P".equals(operazione))
-		        	 opType = OperationType.PRELIEVO;
-		         
-		         listOperazione.add(new Operazione(opType, 
-		        		 quant, dateOp.getTime()));
-		      }
-		} finally {
-			if (rs != null)
-				rs.close();
-			if (pstmt != null)
-				pstmt.close();
-		}
-        
-		return listOperazione;
+	
+		return getOperazioni(null, null, null);
 	}
 
 	public List<Operazione> getOperazioni(OperationType type) throws SQLException {
-		List<Operazione> listOperazione = new ArrayList<>();
-        
-		if (conn == null)
-			conn = getConnection();
 		
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
-		try {
-			
-			pstmt = conn.prepareStatement("SELECT * FROM OPERAZIONI WHERE OPERAZIONE = ? ORDER BY DATE_OP");
-			
-			String operationStr = null;
-			
-			if(type == OperationType.PRELIEVO)
-				operationStr = "P";
-			else if(type == OperationType.VERSAMENTO)
-				operationStr = "V";
-			
-			pstmt.setString(1, operationStr);
-			
-			rs = pstmt.executeQuery();
-			
-			while(rs.next()){
-		         //Retrieve by column name
-		         int id  = rs.getInt("id");
-		         String operazione = rs.getString("OPERAZIONE");
-		         int quant = rs.getInt("QUANT");
-		         Date dateOp = rs.getTimestamp("DATE_OP");
-
-		         OperationType opType = null;
-		         
-		         if("V".equals(operazione))
-		        	 opType = OperationType.VERSAMENTO;
-		         else if("P".equals(operazione))
-		        	 opType = OperationType.PRELIEVO;
-		         
-		         listOperazione.add(new Operazione(opType, 
-		        		 quant, dateOp.getTime()));
-		      }
-		} finally {
-			if (rs != null)
-				rs.close();
-			if (pstmt != null)
-				pstmt.close();
-
-		}
-        
-		return listOperazione;
+		return getOperazioni(type, null, null);
 	}
 
 	public List<Operazione> getOperazioni(OperationType type, Date fromDate, Date toDate) throws SQLException {

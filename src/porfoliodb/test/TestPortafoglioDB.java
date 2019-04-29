@@ -1,5 +1,8 @@
 package porfoliodb.test;
 
+import static porfoliodb.test.TestUtils.stringToDate;
+import static porfoliodb.test.TestUtils.stringToLong;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.sql.SQLException;
@@ -47,13 +50,66 @@ class TestPortafoglioDB {
 	}
 
 	@Test
-	void testGetOperazioniOperationType() {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	void testGetOperazioniOperationTypeDateDate() {
-		// fail("Not yet implemented");
+	void testGetOperazioniOperationTypeDateDate() throws SQLException {
+		
+		// "dd.MM.yy-hh:mm:ss"
+		
+		long lg1 = stringToLong("17.04.19-08:14:56");
+		
+		long lg2 = stringToLong("17.04.19-09:14:27");
+		
+		long lg3 = stringToLong("17.04.20-08:14:56");
+		
+		long lg4 = stringToLong("17.04.20-13:14:56");
+				
+		String url = "jdbc:h2:mem:test;INIT=runscript from './schema/create.sql'";
+		
+		PorfolioDB porfolioDB = new PorfolioDB(url, 
+				"", "");
+		
+		Operazione op1 = new Operazione(OperationType.VERSAMENTO, 170, 
+				lg1);
+		
+		porfolioDB.insertOperazione(op1);
+		
+		Operazione op2 = new Operazione(OperationType.PRELIEVO, 100, 
+				lg2);
+		
+		porfolioDB.insertOperazione(op2);
+		
+		Operazione op3 = new Operazione(OperationType.VERSAMENTO, 250, 
+				lg3);
+		
+		porfolioDB.insertOperazione(op3);
+		
+		Operazione op4 = new Operazione(OperationType.PRELIEVO, 170, 
+				lg4);
+		
+		porfolioDB.insertOperazione(op4);
+		
+		List<Operazione> listOpVer = 
+				porfolioDB.getOperazioni(OperationType.VERSAMENTO);
+		
+		System.out.println(listOpVer);
+		
+		List<Operazione> listOpPrel = 
+				porfolioDB.getOperazioni(OperationType.PRELIEVO);
+		
+		System.out.println(listOpPrel);
+		
+		// [ tipo=VERSAMENTO, qt=170, dt='17.04.19-08:14:56'], 
+		// [ tipo=PRELIEVO, qt=100, dt='17.04.19-09:14:27'], 
+		// [ tipo=VERSAMENTO, qt=250, dt='17.04.20-08:14:56'], 
+		// [ tipo=PRELIEVO, qt=170, dt='17.04.20-01:14:56']
+		
+		List<Operazione> listOp = 
+				porfolioDB.getOperazioni(OperationType.PRELIEVO, stringToDate("17.04.20-08:14:56"), null);
+		
+		System.out.println(listOp);
+		
+		
+		porfolioDB.closeConnection();
+		
 	}
 
 }
