@@ -16,7 +16,26 @@ public class Operazione {
 		this.timestamp = timestamp;
 	}
 	
-	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		
+		if(!(obj instanceof Operazione))
+			return false;
+		
+		Operazione op = (Operazione) obj;
+		
+		if(this.operationType != op.operationType)
+			return false;
+		
+		if(this.quantita != op.quantita)
+			return false;
+		
+		if(this.timestamp != op.timestamp)
+			return false;
+		return true;
+	}
 
 	@Override
 	public String toString() {

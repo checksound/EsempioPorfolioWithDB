@@ -160,12 +160,111 @@ public class PorfolioDB {
 
 	public List<Operazione> getOperazioni(OperationType type, Date fromDate, Date toDate) throws SQLException {
 
+		List<Operazione> listOperazione = new ArrayList<>();
+        
 		if (conn == null)
 			conn = getConnection();
-
 		
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			
+			String query = null;
+			
+			query = "SELECT * FROM OPERAZIONI ";
+			
+			boolean isQueryByOperationType = false;
+			boolean isQueryByDateFrom = false;
+			boolean isQueryByDateTo = false;
+			
+			if(type != null)
+				isQueryByOperationType = true;
+			
+			if(fromDate != null)
+				isQueryByDateFrom = true;
+			
+			if(toDate != null)
+				isQueryByDateTo = true;
+			
+			if(isQueryByOperationType) 
+				query += "WHERE OPERAZIONE = ? ";
+			
+			if(isQueryByDateFrom) {
+				if(isQueryByOperationType) 
+					query += "AND DATE_OP >= ? ";
+				else
+					query += "WHERE DATE_OP >= ? ";
+			}
+			
+			if(isQueryByDateTo) {
+				if(isQueryByOperationType || isQueryByDateFrom) 
+					query += "AND DATE_OP <= ? ";
+				else
+					query += "WHERE DATE_OP <= ? ";
+			}
+						
+			query += " ORDER BY DATE_OP";
+			
+			pstmt = conn.prepareStatement(query);
+			
+			int paramCount = 1;
+			
+			if(isQueryByOperationType) {
+				String operationStr = null;
+				
+				if(type == OperationType.PRELIEVO)
+					operationStr = "P";
+				else if(type == OperationType.VERSAMENTO)
+					operationStr = "V";
+				
+				pstmt.setString(paramCount, operationStr);
+				
+				paramCount++;
+			}
+			
+			if(isQueryByDateFrom) {
+				
+				pstmt.setTimestamp(paramCount, 
+						new Timestamp(fromDate.getTime()));
+				
+				paramCount++;
+			}
+			
+			if(isQueryByDateTo) {
+				
+				pstmt.setTimestamp(paramCount, 
+						new Timestamp(toDate.getTime()));
+			}
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()){
+		         //Retrieve by column name
+		         int id  = rs.getInt("id");
+		         String operazione = rs.getString("OPERAZIONE");
+		         int quant = rs.getInt("QUANT");
+		         Date dateOp = rs.getTimestamp("DATE_OP");
 
-		return null;
+		         OperationType opType = null;
+		         
+		         if("V".equals(operazione))
+		        	 opType = OperationType.VERSAMENTO;
+		         else if("P".equals(operazione))
+		        	 opType = OperationType.PRELIEVO;
+		         
+		         listOperazione.add(new Operazione(opType, 
+		        		 quant, dateOp.getTime()));
+		      }
+		} finally {
+			if (rs != null)
+				rs.close();
+			if (pstmt != null)
+				pstmt.close();
+
+		}
+        
+		return listOperazione;
 	}
 
 }
