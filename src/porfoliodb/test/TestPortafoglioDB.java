@@ -2,14 +2,12 @@ package porfoliodb.test;
 
 import static porfoliodb.test.TestUtils.stringToDate;
 import static porfoliodb.test.TestUtils.stringToLong;
-import static porfoliodb.test.TestUtils.createListTimestamp;
 
 import static porfoliodb.core.OperationType.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
