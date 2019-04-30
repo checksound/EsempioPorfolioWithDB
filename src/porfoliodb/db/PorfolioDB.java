@@ -75,8 +75,38 @@ public class PorfolioDB {
 		
 		return getOperazioni(type, null, null);
 	}
+	
+	public List<Operazione> getOperazioniFromDate(Date dateFrom) throws SQLException {
+		
+		return getOperazioni(null, dateFrom, null);
+	}
 
-	public List<Operazione> getOperazioni(OperationType type, Date fromDate, Date toDate) throws SQLException {
+	public List<Operazione> getOperazioniFromDate(OperationType type, Date dateFrom) throws SQLException {
+		
+		return getOperazioni(type, dateFrom, null);
+	}
+	
+	public List<Operazione> getOperazioniToDate(Date dateTo) throws SQLException {
+		
+		return getOperazioni(null, null, dateTo);
+	}
+
+	public List<Operazione> getOperazioniToDate(OperationType type, Date dateTo) throws SQLException {
+		
+		return getOperazioni(type, null, dateTo);
+	}
+	
+	public List<Operazione> getOperazioniBetweenDate(Date dateFrom, Date dateTo) throws SQLException {
+		
+		return getOperazioni(null, dateFrom, dateTo);
+	}
+
+	public List<Operazione> getOperazioniBetweenDate(OperationType type, Date dateFrom, Date dateTo) throws SQLException {
+		
+		return getOperazioni(type, dateFrom, dateTo);
+	}
+
+	private List<Operazione> getOperazioni(OperationType type, Date fromDate, Date toDate) throws SQLException {
 
 		List<Operazione> listOperazione = new ArrayList<>();
         
