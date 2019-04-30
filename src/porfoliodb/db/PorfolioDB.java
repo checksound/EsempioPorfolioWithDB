@@ -124,8 +124,6 @@ public class PorfolioDB {
 						
 			query += " ORDER BY DATE_OP";
 			
-			System.out.println(query);
-			
 			pstmt = conn.prepareStatement(query);
 			
 			int paramCount = 1;

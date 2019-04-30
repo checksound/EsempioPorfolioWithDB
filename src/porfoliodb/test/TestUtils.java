@@ -22,7 +22,7 @@ public class TestUtils {
 	
 	public static long stringToLong(String stringDate) {
 		// use default format
-		return stringToLong("dd.MM.yy-hh:mm:ss", stringDate);
+		return stringToLong("dd.MM.yy-HH:mm:ss", stringDate);
 	}
 	
 	
@@ -46,7 +46,7 @@ public class TestUtils {
 	public static Date stringToDate(String stringDate) {
 		
 		// use default format
-		return stringToDate("dd.MM.yy-hh:mm:ss", stringDate);
+		return stringToDate("dd.MM.yy-HH:mm:ss", stringDate);
 	}
 	
 	public static Date stringToDate(String format, String stringDate) {
