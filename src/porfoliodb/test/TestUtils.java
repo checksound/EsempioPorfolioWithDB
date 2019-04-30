@@ -2,18 +2,31 @@ package porfoliodb.test;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class TestUtils {
 	
-	static long stringToLong(String stringDate) {
+    public static Long[] createListTimestamp(String... timestampStrings) {
+		
+		List<Long> listTimestamps = new ArrayList<>();
+		
+		for(String timespampString: timestampStrings) {
+			listTimestamps.add(stringToLong(timespampString));
+		}
+		
+		return listTimestamps.toArray(new Long[0]);
+	}
+	
+	public static long stringToLong(String stringDate) {
 		// use default format
 		return stringToLong("dd.MM.yy-hh:mm:ss", stringDate);
 	}
 	
 	
-	static long stringToLong(String format, String stringDate) {
+	public static long stringToLong(String format, String stringDate) {
 		
 		SimpleDateFormat formatter = new SimpleDateFormat(
                 format, 
@@ -30,13 +43,13 @@ public class TestUtils {
 		return (date!= null)? date.getTime(): -1;
 	}
 	
-	static Date stringToDate(String stringDate) {
+	public static Date stringToDate(String stringDate) {
 		
 		// use default format
 		return stringToDate("dd.MM.yy-hh:mm:ss", stringDate);
 	}
 	
-	static Date stringToDate(String format, String stringDate) {
+	public static Date stringToDate(String format, String stringDate) {
 		
 		SimpleDateFormat formatter = new SimpleDateFormat(
                 format, 

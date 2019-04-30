@@ -2,13 +2,17 @@ package porfoliodb.test;
 
 import static porfoliodb.test.TestUtils.stringToDate;
 import static porfoliodb.test.TestUtils.stringToLong;
+import static porfoliodb.test.TestUtils.createListTimestamp;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import porfoliodb.core.OperationType;
 import porfoliodb.core.Operazione;
@@ -48,25 +52,32 @@ class TestPortafoglioDB {
 		
 		porfolioDB.closeConnection();
 	}
+	
+	
 
 	@Test
 	void testGetOperazioniOperationTypeDateDate() throws SQLException {
 		
-		// "dd.MM.yy-hh:mm:ss"
-		
-		long lg1 = stringToLong("17.04.19-08:14:56");
-		
-		long lg2 = stringToLong("17.04.19-09:14:27");
-		
-		long lg3 = stringToLong("17.04.20-08:14:56");
-		
-		long lg4 = stringToLong("17.04.20-13:14:56");
-				
-		String url = "jdbc:h2:mem:test;INIT=runscript from './schema/create.sql'";
+        String url = "jdbc:h2:mem:test;INIT=runscript from './schema/create.sql'";
 		
 		PorfolioDB porfolioDB = new PorfolioDB(url, 
 				"", "");
 		
+		// "dd.MM.yy-hh:mm:ss"
+		Long[] arrTimestamps = createListTimestamp(
+				"17.04.19-08:14:56", 
+				"17.04.19-09:14:27", 
+				"17.04.20-08:14:56", 
+				"17.04.20-13:14:56");
+		
+		long lg1 = arrTimestamps[0];
+		
+		long lg2 = arrTimestamps[1];
+		
+		long lg3 = arrTimestamps[2];
+		
+		long lg4 = arrTimestamps[4];
+				
 		Operazione op1 = new Operazione(OperationType.VERSAMENTO, 170, 
 				lg1);
 		
@@ -103,13 +114,69 @@ class TestPortafoglioDB {
 		// [ tipo=PRELIEVO, qt=170, dt='17.04.20-01:14:56']
 		
 		List<Operazione> listOp = 
-				porfolioDB.getOperazioni(OperationType.PRELIEVO, stringToDate("17.04.20-08:14:56"), null);
+				porfolioDB.getOperazioni(OperationType.PRELIEVO, 
+						stringToDate("17.04.20-08:14:56"), null);
 		
 		System.out.println(listOp);
 		
+		// "17.04.19-08:14:56" "17.04.20-13:14:56"
+		listOp = 
+				porfolioDB.getOperazioni(null, 
+						stringToDate("17.08.19-09:14:56"), 
+						stringToDate("17.04.20-09:14:56"));
+		
+		System.out.println(listOp);
 		
 		porfolioDB.closeConnection();
 		
+	}
+	
+	@ParameterizedTest
+	@ValueSource(strings = {
+	"mom",
+	"dad",
+	"radar",
+	"racecar",
+	"able was I ere I saw elba"
+	})
+	void palindromes(String candidate) {
+	// assertTrue(isPalindrome(candidate));
+	}
+	
+	static List<Operazione> testSuite1() {
+		Long[] arrTimestamps = createListTimestamp(
+				"17.04.19-08:14:56", 
+				"17.04.19-09:14:27", 
+				"17.04.20-08:14:56", 
+				"17.04.20-13:14:56");
+		
+		long lg1 = arrTimestamps[0];
+		
+		long lg2 = arrTimestamps[1];
+		
+		long lg3 = arrTimestamps[2];
+		
+		long lg4 = arrTimestamps[4];
+				
+		Operazione op1 = new Operazione(OperationType.VERSAMENTO, 170, 
+				lg1);
+		
+		Operazione op2 = new Operazione(OperationType.PRELIEVO, 100, 
+				lg2);
+		
+		Operazione op3 = new Operazione(OperationType.VERSAMENTO, 250, 
+				lg3);
+		
+		Operazione op4 = new Operazione(OperationType.PRELIEVO, 170, 
+				lg4);
+		
+		List<Operazione> listOps = new ArrayList<>();
+		listOps.add(op1);
+		listOps.add(op2);
+		listOps.add(op3);
+		listOps.add(op4);
+		
+		return listOps;
 	}
 
 }

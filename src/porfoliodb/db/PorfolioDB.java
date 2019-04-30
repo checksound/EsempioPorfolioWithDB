@@ -21,7 +21,8 @@ public class PorfolioDB {
 	private final String usernameDB;
 	private final String passwordDB;
 
-	public PorfolioDB(String urlDB, String usernameDB, String passwordDB) {
+	public PorfolioDB(String urlDB, 
+			String usernameDB, String passwordDB) {
 		this.urlDB = urlDB;
 		this.usernameDB = usernameDB;
 		this.passwordDB = passwordDB;
@@ -56,6 +57,7 @@ public class PorfolioDB {
 			
 			pstmt.setInt(2, op.quantita);
 			pstmt.setTimestamp(3, new Timestamp(op.timestamp));
+			
 			int val = pstmt.executeUpdate();
 		} finally {
 			if (pstmt != null)
@@ -122,6 +124,8 @@ public class PorfolioDB {
 						
 			query += " ORDER BY DATE_OP";
 			
+			System.out.println(query);
+			
 			pstmt = conn.prepareStatement(query);
 			
 			int paramCount = 1;
@@ -172,6 +176,7 @@ public class PorfolioDB {
 		         listOperazione.add(new Operazione(opType, 
 		        		 quant, dateOp.getTime()));
 		      }
+			
 		} finally {
 			if (rs != null)
 				rs.close();
