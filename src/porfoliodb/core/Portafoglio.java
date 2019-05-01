@@ -100,9 +100,10 @@ public class Portafoglio {
 		if(this.SINGLE_WITHDRAWAL_LIMIT< amount)
 			throw new SingleWithdrawnLimitException(amount, this.SINGLE_WITHDRAWAL_LIMIT);
 		
-		if(this.DAYLY_WITHDRAWAL_LIMIT < 
-				getSumPrelievoInRange(System.currentTimeMillis()) + amount)
-			throw new DailyWithdrawnLimitException(amount, getPrelievoGiornaliero());
+		int currentPrelievoGiornaliero = getPrelievoGiornaliero();
+	
+		if(this.DAYLY_WITHDRAWAL_LIMIT < currentPrelievoGiornaliero + amount)
+			throw new DailyWithdrawnLimitException(amount, currentPrelievoGiornaliero);
 		
 		if(this.disponibilita < amount) 
 			throw new AmountWithdrawnException(amount, this.disponibilita);
